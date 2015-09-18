@@ -3,100 +3,105 @@ title: "Data cleaning - Course project"
 output: html_document
 ---
 -------
-**Introduction**
 
-This document describes the final tidy data set and the process to generate it.
+The output table stored in the "ResultingTidyData" file contains 180 obs. of 88 variables.
 
-I used the "dplyr" package.
+**"activity_label"** Contains the lables of the 6 activities from the experiment.
 
-**Source files**
+- WALKING            
+- WALKING_UPSTAIRS   
+- WALKING_DOWNSTAIRS 
+- SITTING            
+- STANDING          
+- LAYING
 
-From the complete files provided by the download link I used the following:
-
-  - activity_labels.txt -- *(includes the literal labels of the activities recorded)*
-  - features.txt -- *(includes the names of all de variables in the source data set)*
-  - X_test.txt -- *(includes the actual values from the experiment큦 test data set)*
-  - y_test.txt -- *(includes the codes of the activities measurements for the test data set)*
-  - X_train.txt -- *(includes the actual values from the experiment큦 train data set)*
-  - y_train.txt -- *(includes the codes of the activities measurements for the train data set)*
-  - subject_test.txt -- *(includes the codes of the subjets in the experiment for the test data set)*
-  - subject_train.txt -- *(includes the codes of the subjets in the experiment for the train data set)*
-
-I loaded them in tables with the same names and each one contained:
-
-  - activity_labels -- *(6 obs. of 2 variables)*
-  - features -- *(561 obs. of 2 variables)*
-  - X_test -- *(2947 obs. of 561 variables)*
-  - y_test -- *(2947 obs. of 1 variable)*
-  - X_train -- *(7352 obs. of 561 variables)*
-  - y_train -- *(7352 obs. of 1 variable)*
-  - subject_test -- *(2947 obs. of 1 variable)*
-  - subject_train -- *(7352 obs. of 1 variable)*
-  
-**Processing**
-
-In the first step I added the activities labels and the subject labels to both the "test" and "train" data sets.
-
-In order to use the "mutate" function I transformed each data set to a dplyr package friendly class using the "table_df" function.
-
-```
-    x_test <- tbl_df(x_test)
-    x_test <- mutate(x_test, test_label = y_test[,1], subject_label = subject_test[,1])
-    x_train <- tbl_df(x_train)
-    x_train <- mutate(x_train, test_label = y_train[,1], subject_label = subject_train[,1])
-```
-Then I merged "test" and "train" data sets in one called "merged_df" in relation to the course project큦 requirements point 1.
-
-```
-    merged_df <- rbind(x_test, x_train)
-```
-Afterwards I renamed the variables of the "merged_df" using the original source "features", adding manually "activity_label", for the activities labels column, and "subject_label", for the subject labels column.
-
-This was in relation to the course project큦 requirements point 4. I did point 4 just after point 1 because it was easier to apply the complete variables names in the original "features" source before extracting columns from the general data frame.
-
-```
-colnames(merged_df) <- c(as.character(features[,2]), "activity_label", "subject_label")
-```
-In the next setp I replaced the activities labels codes for the literal activities names relating the values of the merged$activity_lavels variable with the corresponding value in the original "activity_labels" data set.
-
-For this to work properly, I changed again the class of the "merged_df" from the "dplyr" package table format to a normal data frame.
-
-This was in relation to the course project큦 requirements point 3.
-
-```
- merged_df <- data.frame(merged_df)
-    for (x in 1:nrow(merged_df)) {
-        merged_df[x, 562] <- as.character(activity_labels[merged_df[x, 562],2])
-    }
-```
-Then I extracted only the mean and sd measurements from the data set, keeping also the "activity" and "subject" columns. Covering the course project큦 requirements point 2.
-
-I could have done this step before, in the order stated in the course project points order. Working with less columns since the beggining would have surelly saved some processing time, but I preffered to do it at this point beacuse it felt more clear to do the complete merging process with the full data set. As saving processing time was not an objective of the project I preorized this clearness.
-
-```
-merged_df <- select(merged_df, grep("*[Mm]ean*|*[Ss]td", colnames(merged_df)), 562, 563)
-```
-Finally I grouped the data set by "activity_label" and "subject_label" variables, storing the result in a new data set called "grouped_df", and summarised the means of each measurement variable.
-
-This way I ended up with a tidy data set with 180 obs *(6 activities * 30 subjects)* and 88 variables *(86 with the "mean" or "sd" realated measurements plus activity and subjects variables)*.
-
-This way a covered the course project큦 requirements point 5 and saved the result in an independent txt file called: "ResultingTidyData.txt" 
-
-```
- grouped_df <- group_by(merged_df, activity_label, subject_label)
-    grouped_df <- summarise_each(grouped_df, funs(mean), 1:86)
-    write.table(grouped_df, file = "ResultingTidyData.txt")
-```
-Hope the explanation was clear enough and please excuse any language missuse, I큟 not native english speaker.
-
-Best!
+**"subject_label"** Contains the numeric codes of the 30 subjects that participated in the experiment.    
+**The resting 86 variables** Contain the average values for each kind of measurement in the experiment.
 
 
-
-
-
-
-
-
-
-
+"tBodyAcc.mean...X"                    
+"tBodyAcc.mean...Y"                   
+"tBodyAcc.mean...Z"                    
+"tBodyAcc.std...X"                    
+"tBodyAcc.std...Y"                     
+"tBodyAcc.std...Z"                    
+"tGravityAcc.mean...X"                 
+"tGravityAcc.mean...Y"                
+"tGravityAcc.mean...Z"                 
+"tGravityAcc.std...X"                 
+"tGravityAcc.std...Y"                  
+"tGravityAcc.std...Z"                 
+"tBodyAccJerk.mean...X"                
+"tBodyAccJerk.mean...Y"               
+"tBodyAccJerk.mean...Z"                
+"tBodyAccJerk.std...X"                
+"tBodyAccJerk.std...Y"                 
+"tBodyAccJerk.std...Z"                
+"tBodyGyro.mean...X"                   
+"tBodyGyro.mean...Y"                  
+"tBodyGyro.mean...Z"                   
+"tBodyGyro.std...X"                   
+"tBodyGyro.std...Y"                    
+"tBodyGyro.std...Z"                   
+"tBodyGyroJerk.mean...X"               
+"tBodyGyroJerk.mean...Y"              
+"tBodyGyroJerk.mean...Z"               
+"tBodyGyroJerk.std...X"               
+"tBodyGyroJerk.std...Y"                
+"tBodyGyroJerk.std...Z"               
+"tBodyAccMag.mean.."                   
+"tBodyAccMag.std.."                   
+"tGravityAccMag.mean.."                
+"tGravityAccMag.std.."                
+"tBodyAccJerkMag.mean.."               
+"tBodyAccJerkMag.std.."               
+"tBodyGyroMag.mean.."                  
+"tBodyGyroMag.std.."                  
+"tBodyGyroJerkMag.mean.."              
+"tBodyGyroJerkMag.std.."              
+"fBodyAcc.mean...X"                    
+"fBodyAcc.mean...Y"                   
+"fBodyAcc.mean...Z"                    
+"fBodyAcc.std...X"                    
+"fBodyAcc.std...Y"                     
+"fBodyAcc.std...Z"                    
+"fBodyAcc.meanFreq...X"                
+"fBodyAcc.meanFreq...Y"               
+"fBodyAcc.meanFreq...Z"                
+"fBodyAccJerk.mean...X"               
+"fBodyAccJerk.mean...Y"                
+"fBodyAccJerk.mean...Z"               
+"fBodyAccJerk.std...X"                 
+"fBodyAccJerk.std...Y"                
+"fBodyAccJerk.std...Z"                 
+"fBodyAccJerk.meanFreq...X"           
+"fBodyAccJerk.meanFreq...Y"            
+"fBodyAccJerk.meanFreq...Z"           
+"fBodyGyro.mean...X"                   
+"fBodyGyro.mean...Y"                  
+"fBodyGyro.mean...Z"                   
+"fBodyGyro.std...X"                   
+"fBodyGyro.std...Y"                    
+"fBodyGyro.std...Z"                   
+"fBodyGyro.meanFreq...X"               
+"fBodyGyro.meanFreq...Y"              
+"fBodyGyro.meanFreq...Z"               
+"fBodyAccMag.mean.."                  
+"fBodyAccMag.std.."                    
+"fBodyAccMag.meanFreq.."              
+"fBodyBodyAccJerkMag.mean.."           
+"fBodyBodyAccJerkMag.std.."           
+"fBodyBodyAccJerkMag.meanFreq.."       
+"fBodyBodyGyroMag.mean.."             
+"fBodyBodyGyroMag.std.."               
+"fBodyBodyGyroMag.meanFreq.."         
+"fBodyBodyGyroJerkMag.mean.."          
+"fBodyBodyGyroJerkMag.std.."          
+"fBodyBodyGyroJerkMag.meanFreq.."      
+"angle.tBodyAccMean.gravity."         
+"angle.tBodyAccJerkMean..gravityMean." 
+"angle.tBodyGyroMean.gravityMean."    
+"angle.tBodyGyroJerkMean.gravityMean." 
+"angle.X.gravityMean."                
+"angle.Y.gravityMean."                 
+"angle.Z.gravityMean."    
